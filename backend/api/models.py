@@ -34,6 +34,25 @@ class CustomUser(AbstractUser):
     )
     def __str__(self):
         return self.username
+    
+
+class Goal(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    duration_months = models.IntegerField(verbose_name='Duration in months', default=0)
+    duration_days = models.IntegerField(verbose_name='Duration in days', default=0)
+    is_smart = models.BooleanField()
+    def __str__(self):
+        return self.title
+    
+class Skill(models.Model):
+    name = models.CharField(max_length=255)
+    user = models.ManyToManyField(CustomUser, related_name='skills')
+    def __str__(self):
+        return self.name
 
     
 
