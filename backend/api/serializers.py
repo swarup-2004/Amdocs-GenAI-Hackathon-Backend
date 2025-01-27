@@ -12,6 +12,12 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         extra_kwargs = {
             'first_name': {'required': True},
             'email': {'required': True, 'allow_blank': False, 'validators': []}, 
+            'last_name': {'required': False},
+            'linkedin_url': {'required': False},
+            'github_url': {'required': False},
+            'leetcode_url': {'required': False},
+            'city': {'required': False},
+            'college': {'required': False}, 
         }
 
     def validate_email(self, value):
