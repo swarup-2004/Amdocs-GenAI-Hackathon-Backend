@@ -1,3 +1,74 @@
-/venv
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.pdb
+*.log
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+__pycache__/
+db.sqlite3
+*.sqlite3
+
+# Media files
+/media
+
+# Static files
+/static
+
+# Environment variables
 .env
-/tempenv
+
+# Django migrations
+*/migrations/*
+
+# Virtual environment
+venv/
+env/
+.venv/
+ENV/
+*.env
+
+# IDEs and editors
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# PyCharm
+*.iml
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Docker files
+*.docker
+docker-compose.override.yml
+
+# Coverage reports
+.coverage
+coverage.xml
+*.cover
+*.log
+nosetests.xml
+test_*.xml
+
+# mypy
+.mypy_cache/
+
+# Sphinx documentation
+docs/_build/
+
+# Pytest
+.cache
+
+# Nox
+.nox/
+
+# pipenv
+Pipfile.lock
