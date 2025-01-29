@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "auth_blacklist",
     'django.contrib.sites',
     'corsheaders',
+    'chatbot',
 ]
 
 SITE_ID = 2
