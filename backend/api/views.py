@@ -3,10 +3,11 @@ from rest_framework import generics
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, views
 from .serializers import CustomUserCreateSerializer, GoalSerializer
 from .models import Goal, Skill
 from .utils.is_smart import is_smart_goal
+from .utils.preliminary_test_question_generation import generate_test
 
 
 User = get_user_model()
@@ -47,6 +48,16 @@ class GoalModelViewSet(viewsets.ModelViewSet):
             # Return the response with a 400 status code
             return Response(is_smart_goal_dict, status=status.HTTP_400_BAD_REQUEST)
 
-        
+
+class PreliminaryQuizAPIView(views.APIView):
+    def get(self, request, *args, **kwargs):
+
+        education = request.data.get('education', '')
+        goal_title = request.data.get('goal_title', '')
+        goal_desc = request.data.get('goal_desc', '')
+        skills = Skill.objects.filter(user=request.user).values_list('name', flat=True)
+        questions = generate_test(education, goal_title, goal_desc, skills)
+        # print(questions)
+        return Response(questions, status=status.HTTP_200_OK)
     
 
