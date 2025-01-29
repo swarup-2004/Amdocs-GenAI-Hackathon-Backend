@@ -7,8 +7,7 @@ from langchain_groq import ChatGroq
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-chat = ChatGroq(temperature=0, groq_api_key=GROQ_API_KEY, model_name="mixtral-8x7b-32768")
-
+chat = ChatGroq(temperature=0, groq_api_key=GROQ_API_KEY, model_name="deepseek-r1-distill-llama-70b")
 
 def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: str) -> dict:
     
@@ -29,7 +28,7 @@ def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: s
     # Prompt 
     smart_prompt = ChatPromptTemplate.from_template(template=is_smart_goal_template)
 
-
+    print(smart_prompt)
     is_smart_message = smart_prompt.format_messages(
         goal_title=goal_title,
         goal_desc=goal_desc,
