@@ -9,23 +9,24 @@ API_KEY = os.getenv("GROQ_API_KEY")
 chat = ChatGroq(temperature=0, groq_api_key=API_KEY, model_name="deepseek-r1-distill-llama-70b")
 
 # Define individual question schema components
-question_type_schema = ResponseSchema(name="question_type", description="The Bloom's Taxonomy level and cognitive verb for the question.")
-skill_tested_schema = ResponseSchema(name="skill_tested", description="The specific skill from the user's list or a prerequisite skill being tested.")
-difficulty_tier_schema = ResponseSchema(name="difficulty_tier", description="The difficulty level of the question: Basic, Intermediate, or Advanced.")
-question_schema = ResponseSchema(name="question", description="The question statement.")
-options_schema = ResponseSchema(name="options", description="Four options to choose from, as a list of strings, with distractors reflecting common misconceptions.")
-right_answer_schema = ResponseSchema(name="right_answer", description="The correct option for the question.")
-diagnostic_insight_schema = ResponseSchema(name="diagnostic_insight", description="What this question reveals about the user's understanding.")
+question_schemas = [
+    ResponseSchema(name="question_type", description="The Bloom's Taxonomy level and cognitive verb for the question."),
+    ResponseSchema(name="skill_tested", description="The specific skill from the user's list or a prerequisite skill being tested."),
+    ResponseSchema(name="difficulty_tier", description="The difficulty level of the question: Basic, Intermediate, or Advanced."),
+    ResponseSchema(name="question", description="The question statement."),
+    ResponseSchema(name="options", description="Four options to choose from, as a list of strings, with distractors reflecting common misconceptions."),
+    ResponseSchema(name="right_answer", description="The correct answer."),
+    ResponseSchema(name="diagnostic_insight", description="What this question reveals about the user's understanding.")
+]
 
-# Wrap the individual question schemas in a list format
-questions_schema = ResponseSchema(
+questions_schema = StructuredOutputParser.from_response_schemas([ResponseSchema(
     name="questions",
-    description="A list of questions, each with a question type, skill tested, difficulty tier, question statement, four options, the correct answer, and diagnostic insight."
-)
+    description="A list of questions, each with a question type, skill tested, difficulty tier, question statement, four options, the correct answer, and diagnostic insight.",
+    type="list[dict]"
+)])
 
 # Define the parser for a list of questions
-output_parse = StructuredOutputParser.from_response_schemas([questions_schema])
-format_instructions = output_parse.get_format_instructions()
+format_instructions = questions_schema.get_format_instructions()
 
 text = """I am a {education} student.
 I want to learn {goal_title}, with this description: {goal_desc}.
@@ -61,11 +62,11 @@ def generate_test(education: str, goal_title: str, goal_desc: str, skills: str) 
     })
 
     response = chat.invoke(prompt)
-    test_dict = output_parse.parse(response.content)
+    test_dict = questions_schema.parse(response.content)
 
     return (test_dict['questions'])
 
-# print(generate_test("Computer Engineering", "Web Development", "I want to learn MERN Stack", "HTML, CSS, JavaScript"))
+print(generate_test("Computer Engineering", "Web Development", "I want to learn MERN Stack", "HTML, CSS, JavaScript"))
 
 # # prompt_template.invoke({
 # #     "education": "Computer Engineering",
