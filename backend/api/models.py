@@ -45,6 +45,7 @@ class Goal(models.Model):
     duration_months = models.IntegerField(verbose_name='Duration in months', default=0)
     duration_days = models.IntegerField(verbose_name='Duration in days', default=0)
     is_smart = models.BooleanField()
+    is_completed = models.BooleanField(default=False)
     def __str__(self):
         return self.title
     
@@ -59,12 +60,12 @@ class Test(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     def __str__(self):
-        return self.question
+        return self.qdrant_id
     
 class Score(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    right_fluency = models.DecimalField(max_digits=5, decimal_places=2)
-    wrong_fluency = models.DecimalField(max_digits=5, decimal_places=2) 
+    right_fluency = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    wrong_fluency = models.DecimalField(max_digits=5, decimal_places=2, default=0) 
     test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):

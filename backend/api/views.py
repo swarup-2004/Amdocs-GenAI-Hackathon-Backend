@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status, views
-from .serializers import CustomUserCreateSerializer, GoalSerializer, TestSerializer
-from .models import Goal, Skill, Test
+from .serializers import CustomUserCreateSerializer, GoalSerializer, TestSerializer, FeedbackSerializer, ScoreSerializer
+from .models import Goal, Skill, Test, Score, Feedback, LearningModule
 from .utils.is_smart import is_smart_goal
 from .utils.preliminary_test_question_generation import generate_test
 from .utils.qdrant_utils import insert_point 
@@ -81,6 +81,40 @@ class PreliminaryQuizAPIView(views.APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response(test_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
+class LearningModuleAPIView(views.APIView):
+    # def post(self, request, *args, **kwargs):
+    #     # Get the data from the request
+    #     goal_id = request.data.get('goal_id', '')
+    #     qdrant_id = request.data.get('qdrant_id', '')
+
+    #     # Create the LearningModule instance
+    #     learning_module = LearningModule.objects.create(
+    #         user=request.user,
+    #         goal_id=goal_id,
+    #         qdrant_id=qdrant_id
+    #     )
+
+    #     # Return the response with the serialized data
+    #     return Response({
+    #         "data": {
+    #             "user": learning_module.user.id,
+    #             "goal": learning_module.goal_id,
+    #             "qdrant_id": learning_module.qdrant_id
+    #         }
+    #     }, status=status.HTTP_200_OK)
+
+    pass 
+
+class FeedbackModelViewSet(viewsets.ModelViewSet):
+    serializer_class = FeedbackSerializer
+
+    def get_queryset(self):
+        return Feedback.objects.filter(user=self.request.user)
     
+class ScoreModelViewSet(viewsets.ModelViewSet):
+    serializer_class = ScoreSerializer
 
+    def get_queryset(self):
+        return Score.objects.filter(user=self.request.user)
