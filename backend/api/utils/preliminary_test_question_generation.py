@@ -64,7 +64,7 @@ def generate_test(education: str, goal_title: str, goal_desc: str, skills: str) 
     response = chat.invoke(prompt)
     test_dict = questions_schema.parse(response.content)
 
-    return (test_dict['questions'])
+    return (test_dict)
 
 # print(generate_test("Computer Engineering", "Web Development", "I want to learn MERN Stack", "HTML, CSS, JavaScript"))
 
