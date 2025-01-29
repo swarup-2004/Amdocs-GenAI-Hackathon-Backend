@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from django.contrib.auth import get_user_model
-from .models import Goal
+from .models import Goal, Skill, Test, Score, Feedback, LearningModule
 
 User = get_user_model()
 
@@ -39,6 +39,43 @@ class GoalSerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {
             'is_smart': {'required': False},
+            'user': {'required': False}
+        }
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = "__all__"
+        extra_kwargs = {
+            'user': {'required': False}
+        }
+
+class TestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Test
+        fields = "__all__"
+
+class ScoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Score
+        fields = "__all__"
+        extra_kwargs = {
+            'user': {'required': False}
+        }
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = "__all__"
+        extra_kwargs = {
+            'user': {'required': False}
+        }
+
+class LearningModuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LearningModule
+        fields = "__all__"
+        extra_kwargs = {
             'user': {'required': False}
         }
 
