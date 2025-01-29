@@ -53,6 +53,37 @@ class Skill(models.Model):
     user = models.ManyToManyField(CustomUser, related_name='skills')
     def __str__(self):
         return self.name
+    
+class Test(models.Model):
+    qdrant_id = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.question
+    
+class Score(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    right_fluency = models.DecimalField(max_digits=5, decimal_places=2)
+    wrong_fluency = models.DecimalField(max_digits=5, decimal_places=2) 
+    test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.user.username
+    
+
+class LearningModule(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    goal = models.ForeignKey(Goal, on_delete=models.CASCADE)
+    qdrant_id = models.CharField(max_length=255)
+    
+
+class Feedback(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    learning_module = models.ForeignKey(LearningModule, on_delete=models.CASCADE)
+    feedback = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.user.username
 
     
 
