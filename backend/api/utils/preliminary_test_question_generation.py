@@ -15,7 +15,7 @@ question_schemas = [
     ResponseSchema(name="difficulty_tier", description="The difficulty level of the question: Basic, Intermediate, or Advanced."),
     ResponseSchema(name="question", description="The question statement."),
     ResponseSchema(name="options", description="Four options to choose from, as a list of strings, with distractors reflecting common misconceptions."),
-    ResponseSchema(name="right_answer", description="The correct answer."),
+    ResponseSchema(name="right_answer", description="The whole correct answer."),
     ResponseSchema(name="diagnostic_insight", description="What this question reveals about the user's understanding.")
 ]
 
@@ -66,7 +66,7 @@ def generate_test(education: str, goal_title: str, goal_desc: str, skills: str) 
 
     return (test_dict['questions'])
 
-print(generate_test("Computer Engineering", "Web Development", "I want to learn MERN Stack", "HTML, CSS, JavaScript"))
+# print(generate_test("Computer Engineering", "Web Development", "I want to learn MERN Stack", "HTML, CSS, JavaScript"))
 
 # # prompt_template.invoke({
 # #     "education": "Computer Engineering",
