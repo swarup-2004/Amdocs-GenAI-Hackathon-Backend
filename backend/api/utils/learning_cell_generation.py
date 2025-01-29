@@ -149,15 +149,16 @@ def create_learning_cell_chain(llm):
 
 chain = create_learning_cell_chain(chat)
     
-result = chain({
-        "education": "Computer Engineering",
-        "skills": "Python, Basic Algorithms",
-        "time_period": "8 weeks",
-        "goal_title": "Deep Learning",
-        "goal_desc": "Build neural networks from scratch using PyTorch"
+def call_chain(education, skills, time_period, goal_title, goal_desc):
+
+    result = chain({
+        "education": education,
+        "skills": skills,
+        "time_period": time_period,
+        "goal_title": goal_title,
+        "goal_desc": goal_desc
     })
-    
-def call_chain():
+
     parsed_roadmap = roadmap_parser.parse(result["roadmap"])
     parsed_practice = practice_parser.parse(result["practice"])
     parsed_quiz = quiz_parser.parse(result["quiz"])
