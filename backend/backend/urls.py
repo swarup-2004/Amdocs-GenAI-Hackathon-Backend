@@ -25,6 +25,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     path("auth/", include("auth_blacklist.urls")),
     path("api/", include("api.urls")),
+    path("chat/", include("chatbot.urls")),
 ]
 
 
