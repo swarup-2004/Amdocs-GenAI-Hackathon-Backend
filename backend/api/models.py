@@ -80,7 +80,7 @@ class LearningModule(models.Model):
 
 class Feedback(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    learning_module = models.ForeignKey(LearningModule, on_delete=models.CASCADE)
+    learning_module = models.ForeignKey(LearningModule, on_delete=models.CASCADE, default=None)
     feedback = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):

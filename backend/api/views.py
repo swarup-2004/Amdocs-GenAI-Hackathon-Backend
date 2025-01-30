@@ -8,7 +8,8 @@ from .serializers import CustomUserCreateSerializer, GoalSerializer, TestSeriali
 from .models import Goal, Skill, Test, Score, Feedback, LearningModule
 from .utils.is_smart import is_smart_goal
 from .utils.preliminary_test_question_generation import generate_test
-from .utils.qdrant_utils import insert_point 
+from .utils.qdrant_utils import insert_point, search_point
+from .utils.learning_cell_generation import call_chain
 
 
 User = get_user_model()
@@ -84,28 +85,43 @@ class PreliminaryQuizAPIView(views.APIView):
         
 
 class LearningModuleAPIView(views.APIView):
-    # def post(self, request, *args, **kwargs):
-    #     # Get the data from the request
-    #     goal_id = request.data.get('goal_id', '')
-    #     qdrant_id = request.data.get('qdrant_id', '')
+    def post(self, request, *args, **kwargs):
+        # Get the data from the request
+        goal_id = request.data.get('goal_id', '')
+        goal_title = Goal.objects.get(id=goal_id).title
+        education = request.data.get('education', '')
+        goal_desc = Goal.objects.get(id=goal_id).description
+        skills = Skill.objects.filter(user=request.user).values_list('name', flat=True)
+        time_period = Goal.objects.get(id=goal_id).duration_months * 30 + Goal.objects.get(id=goal_id).duration_days
+        roadmap, practice, quiz = call_chain(education, skills, time_period, goal_title, goal_desc)
+        # print(roadmap)
+        # print(practice)
+        # print(quiz)
+        qdrant_id = insert_point('learning_module', {"roadmap": roadmap, "practice": practice, "quiz": quiz})
+        # print(qdrant_id)
+        # Create the LearningModule instance
+        learning_module = LearningModule.objects.create(
+            user=request.user,
+            goal_id=goal_id,
+            qdrant_id=qdrant_id
+        )
 
-    #     # Create the LearningModule instance
-    #     learning_module = LearningModule.objects.create(
-    #         user=request.user,
-    #         goal_id=goal_id,
-    #         qdrant_id=qdrant_id
-    #     )
+        # # Return the response with the serialized data
+        return Response({
+            "data": {
+                "user": learning_module.user.id,
+                "goal": learning_module.goal_id,
+                "qdrant_id": learning_module.qdrant_id
+            }
+        }, status=status.HTTP_200_OK)
+    
+    def get(self, request, *args, **kwargs):
+        module_id = request.data.get('module_id', '')
+        learning_module = LearningModule.objects.get(id=module_id)
+        data = search_point("learning_module", learning_module.qdrant_id)
+        return Response(data, status=status.HTTP_200_OK)
 
-    #     # Return the response with the serialized data
-    #     return Response({
-    #         "data": {
-    #             "user": learning_module.user.id,
-    #             "goal": learning_module.goal_id,
-    #             "qdrant_id": learning_module.qdrant_id
-    #         }
-    #     }, status=status.HTTP_200_OK)
-
-    pass 
+    
 
 class FeedbackModelViewSet(viewsets.ModelViewSet):
     serializer_class = FeedbackSerializer

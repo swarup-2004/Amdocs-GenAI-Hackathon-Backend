@@ -7,13 +7,14 @@ from langchain_groq import ChatGroq
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-chat = ChatGroq(temperature=0, groq_api_key=GROQ_API_KEY, model_name="deepseek-r1-distill-llama-70b")
+chat = ChatGroq(temperature=0, groq_api_key=GROQ_API_KEY, model_name="mixtral-8x7b-32768")
 
 def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: str) -> dict:
     
     is_smart_goal_template = """
     I am studnet and I want to learn {goal_title} and the description for the skill is {goal_desc}.
     I have the following skills: {skills} and the duration for this goal is {goal_duration} days .is this a smart goal?
+    Do not check very strictly 
     {smart_format_instructions}
     """
 
