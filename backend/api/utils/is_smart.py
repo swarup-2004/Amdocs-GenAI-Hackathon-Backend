@@ -13,23 +13,23 @@ def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: s
     
     is_smart_goal_template = """
     I am studnet and I want to learn {goal_title} and the description for the skill is {goal_desc}.
-    I have the following skills: {skills} and the duration for this goal is {goal_duration} days .is this a smart goal?
-    Do not check very strictly 
+    I have the following skills: {skills} and the duration for this goal is {goal_duration} days.
     {smart_format_instructions}
     """
 
     # Schmea for the output
     is_smart_schmea = ResponseSchema(name="is_smart", description="whether the goal is smart or not")
     reason_schema = ResponseSchema(name="reason", description="reason for the answer")
+    smart_example_schema = ResponseSchema(name="smart_example", description="give some suggestions to the user to make his goal SMART")
 
     # Output parser
-    is_smart_output_parse = StructuredOutputParser.from_response_schemas([is_smart_schmea, reason_schema])
+    is_smart_output_parse = StructuredOutputParser.from_response_schemas([is_smart_schmea, reason_schema, smart_example_schema])
     smart_format_instructions = is_smart_output_parse.get_format_instructions()
 
     # Prompt 
     smart_prompt = ChatPromptTemplate.from_template(template=is_smart_goal_template)
 
-    print(smart_prompt)
+    # print(smart_prompt)
     is_smart_message = smart_prompt.format_messages(
         goal_title=goal_title,
         goal_desc=goal_desc,
@@ -39,7 +39,7 @@ def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: s
     )
 
     response = chat.invoke(is_smart_message)
-
-    is_smart_dict = is_smart_output_parse.parse(response.content)
+    # print(response.content)
+    is_smart_dict = is_smart_output_parse.parse(response.content) 
 
     return is_smart_dict

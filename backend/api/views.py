@@ -36,10 +36,10 @@ class GoalModelViewSet(viewsets.ModelViewSet):
         goal_duration_months = serializer.validated_data.get('duration_months')
         goal_duration_days = serializer.validated_data.get('duration_days')
         skills = Skill.objects.filter(user=request.user).values_list('name', flat=True)
-        print(type(skills))
+        # print(type(skills))
         is_smart_goal_dict = is_smart_goal(goal_title, goal_description, skills, goal_duration_months * 30 + goal_duration_days)
-
-        if is_smart_goal_dict['is_smart'] == 'yes':
+        # print(is_smart_goal_dict['is_smart'])
+        if is_smart_goal_dict['is_smart'].lower() == 'yes':
             serializer.validated_data['is_smart'] = True
             # Save the instance and explicitly pass the user
             serializer.save(user=request.user)
