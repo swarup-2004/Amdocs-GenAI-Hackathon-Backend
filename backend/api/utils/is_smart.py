@@ -3,17 +3,39 @@ import os
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
+from langchain_community.graphs import Neo4jGraph
 
+NEO4J_URI = os.getenv("NEO4J_URI")
+NEO4J_USERNAME = os.getenv("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+
+kg = Neo4jGraph(
+    url=NEO4J_URI, username=NEO4J_USERNAME, password=NEO4J_PASSWORD, database='neo4j'
+)
+
+skill_cypher = """MATCH (u:User {name: "Tanmay"})-[r:HAS_SKILL]->(s:Skill)
+RETURN s.name"""
+
+goal_cypher = """MATCH (u:User {name: "Tanmay"})-[r:TARGETS]->(s:JobRole)
+RETURN s.title;"""
+
+education_cypher = """MATCH (u:User {name: "Tanmay"}) RETURN u.degreeName, u.fieldOfStudy"""
+
+education = kg.query(education_cypher)
+
+skills = kg.query(skill_cypher)
+
+goal_title = kg.query(goal_cypher)
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 chat = ChatGroq(temperature=0, groq_api_key=GROQ_API_KEY, model_name="deepseek-r1-distill-llama-70b")
 
-def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: str) -> dict:
+def is_smart_goal(goal_title: str, skills: str) -> dict:
     
     is_smart_goal_template = """
-    I am studnet and I want to learn {goal_title} and the description for the skill is {goal_desc}.
-    I have the following skills: {skills} and the duration for this goal is {goal_duration} days .is this a smart goal?
+    I am studnet and I want to become {goal_title}.
+    I have the following skills: {skills} and the duration for this goal is {goal_duration} days .is this achievable goal?
     {smart_format_instructions}
     """
 
@@ -30,10 +52,9 @@ def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: s
 
     print(smart_prompt)
     is_smart_message = smart_prompt.format_messages(
-        goal_title=goal_title,
-        goal_desc=goal_desc,
-        skills=skills,
-        goal_duration=goal_duration,
+        goal_title=str(goal_title),
+        skills=str(skills),
+        goal_duration="10 years",
         smart_format_instructions=smart_format_instructions
     )
 
@@ -42,3 +63,5 @@ def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: s
     is_smart_dict = is_smart_output_parse.parse(response.content)
 
     return is_smart_dict
+
+print(is_smart_goal(goal_title, skills))

@@ -4,6 +4,31 @@ from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
+from langchain_community.graphs import Neo4jGraph
+
+NEO4J_URI = os.getenv("NEO4J_URI")
+NEO4J_USERNAME = os.getenv("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+
+kg = Neo4jGraph(
+    url=NEO4J_URI, username=NEO4J_USERNAME, password=NEO4J_PASSWORD, database='neo4j'
+)
+
+skill_cypher = """MATCH (u:User {name: "Tanmay"})-[r:HAS_SKILL]->(s:Skill)
+RETURN s.name"""
+
+goal_cypher = """MATCH (u:User {name: "Tanmay"})-[r:TARGETS]->(s:JobRole)
+RETURN s.title;"""
+
+education_cypher = """MATCH (u:User {name: "Tanmay"}) RETURN u.degreeName, u.fieldOfStudy"""
+
+education = kg.query(education_cypher)
+
+skills = kg.query(skill_cypher)
+
+goal_title = kg.query(goal_cypher)
+
+# print(education, skills, goal_title)
 
 API_KEY = os.getenv("GROQ_API_KEY")
 chat = ChatGroq(temperature=0, groq_api_key=API_KEY, model_name="deepseek-r1-distill-llama-70b")
@@ -29,7 +54,7 @@ questions_schema = StructuredOutputParser.from_response_schemas([ResponseSchema(
 format_instructions = questions_schema.get_format_instructions()
 
 text = """I am a {education} student.
-I want to learn {goal_title}, with this description: {goal_desc}.
+I want to become {goal_title} in {goal_duration}.
 My current relevant skills are: {skills}.
 
 Please create a personalized 10-question quiz that:
@@ -52,12 +77,12 @@ Use the following format for the quiz:
 
 prompt_template = PromptTemplate.from_template(text)
 
-def generate_test(education: str, goal_title: str, goal_desc: str, skills: str) -> dict:
+def generate_test(education: str, goal_title: str, skills: str) -> dict:
     prompt = prompt_template.invoke({
-        "education": education,
-        "goal_title": goal_title,
-        "goal_desc": goal_desc,
-        "skills": skills,
+        "education": str(education),
+        "goal_title": str(goal_title),
+        "goal_duration": "3 months",
+        "skills": str(skills),
         "format_instructions": format_instructions
     })
 
@@ -65,6 +90,8 @@ def generate_test(education: str, goal_title: str, goal_desc: str, skills: str) 
     test_dict = questions_schema.parse(response.content)
 
     return (test_dict)
+
+print(generate_test(education, goal_title, skills))
 
 # print(generate_test("Computer Engineering", "Web Development", "I want to learn MERN Stack", "HTML, CSS, JavaScript"))
 

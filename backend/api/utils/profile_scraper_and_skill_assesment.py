@@ -10,7 +10,7 @@ LINKEDIN_TOKEN = os.getenv("LINKEDIN_API_KEY")
 
 def scrape_linkedin(name: str):
     # Note: Storing credentials in code is not recommended for production use
-    api = Linkedin('tanmayiscoding@gmail.com', LINKEDIN_TOKEN)
+    api = Linkedin('tanmayspaln@gmail.com', 'Amdocs@2025*')
     profile = api.get_profile(name)
     return profile
 
@@ -73,7 +73,9 @@ def fetch_github_profile(username: str):
 
 # Example usage
 github_profile = fetch_github_profile("decodingafterlife")
-linkedin_profile = scrape_linkedin('tanmay-shingavi')
+linkedin_profile = scrape_linkedin('swarup-pokharkar')
+
+print(type(github_profile), type(linkedin_profile))
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 chat = ChatGroq(temperature=0, groq_api_key=GROQ_API_KEY, model_name="deepseek-r1-distill-llama-70b")
