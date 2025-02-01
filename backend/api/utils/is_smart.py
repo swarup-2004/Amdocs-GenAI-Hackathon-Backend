@@ -18,7 +18,7 @@ def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: s
     """
 
     # Schmea for the output
-    is_smart_schmea = ResponseSchema(name="is_smart", description="whether the goal is smart or not")
+    is_smart_schmea = ResponseSchema(name="is_smart", description="whether the goal is smart or not and it should be yes or no")
     reason_schema = ResponseSchema(name="reason", description="reason for the answer")
     smart_example_schema = ResponseSchema(name="smart_example", description="give some suggestions to the user to make his goal SMART")
 

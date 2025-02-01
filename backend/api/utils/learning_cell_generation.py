@@ -30,6 +30,7 @@ Create a comprehensive learning roadmap that:
 2. Includes practical projects
 3. Balances theory/practice
 4. Has clear progression markers
+Do not use end of line characters or any comments
 
 Format: {format_instructions}"""
 
@@ -59,6 +60,8 @@ Create practice instructions that:
 3. Provide real-world applications
 4. Suggest troubleshooting exercises
 
+Do not use end of line characters or any comments
+
 Format: {format_instructions}"""
 
 practice_prompt = PromptTemplate(
@@ -72,47 +75,47 @@ practice_prompt = PromptTemplate(
 # =====================
 # (Using the existing quiz schema from question)
 
-question_schemas = [
-    ResponseSchema(name="question_type", description="The Bloom's Taxonomy level and cognitive verb for the question."),
-    ResponseSchema(name="skill_tested", description="The specific skill from the user's list or a prerequisite skill being tested."),
-    ResponseSchema(name="difficulty_tier", description="The difficulty level of the question: Basic, Intermediate, or Advanced."),
-    ResponseSchema(name="question", description="The question statement."),
-    ResponseSchema(name="options", description="Four options to choose from, as a list of strings, with distractors reflecting common misconceptions."),
-    ResponseSchema(name="right_answer", description="The whole correct answer."),
-    ResponseSchema(name="diagnostic_insight", description="What this question reveals about the user's understanding.")
-]
+# question_schemas = [
+#     ResponseSchema(name="question_type", description="The Bloom's Taxonomy level and cognitive verb for the question."),
+#     ResponseSchema(name="skill_tested", description="The specific skill from the user's list or a prerequisite skill being tested."),
+#     ResponseSchema(name="difficulty_tier", description="The difficulty level of the question: Basic, Intermediate, or Advanced."),
+#     ResponseSchema(name="question", description="The question statement."),
+#     ResponseSchema(name="options", description="Four options to choose from, as a list of strings, with distractors reflecting common misconceptions."),
+#     ResponseSchema(name="right_answer", description="The whole correct answer."),
+#     ResponseSchema(name="diagnostic_insight", description="What this question reveals about the user's understanding.")
+# ]
 
-quiz_parser = StructuredOutputParser.from_response_schemas([ResponseSchema(
-    name="questions",
-    description="A list of questions, each with a question type, skill tested, difficulty tier, question statement, four options, the correct answer, and diagnostic insight.",
-    type="list[dict]"
-)])
-quiz_format = quiz_parser.get_format_instructions()
+# quiz_parser = StructuredOutputParser.from_response_schemas([ResponseSchema(
+#     name="questions",
+#     description="A list of questions, each with a question type, skill tested, difficulty tier, question statement, four options, the correct answer, and diagnostic insight.",
+#     type="list[dict]"
+# )])
+# quiz_format = quiz_parser.get_format_instructions()
 
-quiz_template = """Given this roadmap: {roadmap}
-And these practice activities: {practice}
+# quiz_template = """Given this roadmap: {roadmap}
+# And these practice activities: {practice}
 
-Generate a diagnostic quiz with 10 questions that:
-1. Assesses knowledge at all Bloom's Taxonomy levels (Remember, Understand, Apply, Analyze, Evaluate, Create)
-2. Covers all roadmap stages and creates relevant questions
-3. Mirrors real practice challenges
-4. Progresses from recognition to creation
-5. Includes performance analysis hooks
+# Generate a diagnostic quiz with 10 questions that:
+# 1. Assesses knowledge at all Bloom's Taxonomy levels (Remember, Understand, Apply, Analyze, Evaluate, Create)
+# 2. Covers all roadmap stages and creates relevant questions
+# 3. Mirrors real practice challenges
+# 4. Progresses from recognition to creation
+# 5. Includes performance analysis hooks
 
-**Question Type**: [Bloom's Level + Cognitive Verb]
-**Skill Tested**: [Specific skill from my roadmap]
-**Difficulty Tier**: [Basic/Intermediate/Advanced based on my roadmap]
-**Question**: [Stem with context]
-**Options**: [Multiple choice/distractors reflecting common misconceptions]
-**Diagnostic Insight**: [What this question reveals about my understanding and what I have learnt]
+# **Question Type**: [Bloom's Level + Cognitive Verb]
+# **Skill Tested**: [Specific skill from my roadmap]
+# **Difficulty Tier**: [Basic/Intermediate/Advanced based on my roadmap]
+# **Question**: [Stem with context]
+# **Options**: [Multiple choice/distractors reflecting common misconceptions]
+# **Diagnostic Insight**: [What this question reveals about my understanding and what I have learnt]
 
-Format: {format_instructions}"""
+# Format: {format_instructions}"""
 
-quiz_prompt = PromptTemplate(
-    template=quiz_template,
-    input_variables=["roadmap", "practice"],
-    partial_variables={"format_instructions": quiz_format}
-)
+# quiz_prompt = PromptTemplate(
+#     template=quiz_template,
+#     input_variables=["roadmap", "practice"],
+#     partial_variables={"format_instructions": quiz_format}
+# )
 
 # ======================
 # Chained Execution
@@ -130,16 +133,16 @@ def create_learning_cell_chain(llm):
         output_key="practice"
     )
     
-    quiz_chain = LLMChain(
-        llm=llm,
-        prompt=quiz_prompt,
-        output_key="quiz"
-    )
+    # quiz_chain = LLMChain(
+    #     llm=llm,
+    #     prompt=quiz_prompt,
+    #     output_key="quiz"
+    # )
 
     return SequentialChain(
-        chains=[roadmap_chain, practice_chain, quiz_chain],
+        chains=[roadmap_chain, practice_chain],
         input_variables=["education", "skills", "time_period", "goal_title", "goal_desc"],
-        output_variables=["roadmap", "practice", "quiz"],
+        output_variables=["roadmap", "practice"],
         verbose=True
     )
 
@@ -161,9 +164,8 @@ def call_chain(education, skills, time_period, goal_title, goal_desc):
 
     parsed_roadmap = roadmap_parser.parse(result["roadmap"])
     parsed_practice = practice_parser.parse(result["practice"])
-    parsed_quiz = quiz_parser.parse(result["quiz"])
 
-    return parsed_roadmap, parsed_practice, (parsed_quiz['questions'])
+    return parsed_roadmap, parsed_practice
 
 # parsed_roadmap, parsed_practice, parsed_quiz = call_chain()
 

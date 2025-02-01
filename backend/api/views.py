@@ -5,12 +5,13 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status, views
 from django.shortcuts import get_object_or_404
-from .serializers import CustomUserCreateSerializer, GoalSerializer, TestSerializer, FeedbackSerializer, ScoreSerializer
+from .serializers import CustomUserCreateSerializer, GoalSerializer, TestSerializer, FeedbackSerializer, ScoreSerializer, LearningModuleSerializer
 from .models import Goal, Skill, Test, Score, Feedback, LearningModule
 from .utils.is_smart import is_smart_goal
 from .utils.preliminary_test_question_generation import generate_test
 from .utils.qdrant_utils import insert_point, search_point
 from .utils.learning_cell_generation import call_chain
+from .utils.update_learning_cell import update_learning_module
 
 
 User = get_user_model()
@@ -51,21 +52,33 @@ class GoalModelViewSet(viewsets.ModelViewSet):
             # Return the response with a 400 status code
             return Response(is_smart_goal_dict, status=status.HTTP_400_BAD_REQUEST)
 
-class LearningModuleAPIView(views.APIView):
-    def post(self, request, *args, **kwargs):
+class LearningModuleModelViewSet(viewsets.ModelViewSet):
+    serializer_class = LearningModuleSerializer
+
+    def get_queryset(self):
+        return LearningModule.objects.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
         # Get the data from the request
         goal_id = request.data.get('goal_id', '')
+        learning_module = LearningModule.objects.filter(user=request.user, goal_id=goal_id)
+        if learning_module.exists():
+            return Response({
+                "is_created": True,
+                "message": "Learning Module already exists for this goal"
+            }, status=status.HTTP_200_OK)
+        print(goal_id)  
         goal_title = Goal.objects.get(id=goal_id).title
         education = request.data.get('education', '')
         goal_desc = Goal.objects.get(id=goal_id).description
         skills = Skill.objects.filter(user=request.user).values_list('name', flat=True)
         time_period = Goal.objects.get(id=goal_id).duration_months * 30 + Goal.objects.get(id=goal_id).duration_days
-        roadmap, practice, quiz = call_chain(education, skills, time_period, goal_title, goal_desc)
-        # print(roadmap)
-        # print(practice)
+        roadmap, practice = call_chain(education, skills, time_period, goal_title, goal_desc)
+        print(roadmap)
+        print(practice)
         # print(quiz)
-        qdrant_id = insert_point('learning_module', {"roadmap": roadmap, "practice": practice, "quiz": quiz})
-        # print(qdrant_id)
+        qdrant_id = insert_point('learning_module', {"roadmap": roadmap, "practice": practice})
+        print(qdrant_id)
         # Create the LearningModule instance
         learning_module = LearningModule.objects.create(
             user=request.user,
@@ -82,11 +95,37 @@ class LearningModuleAPIView(views.APIView):
             }
         }, status=status.HTTP_200_OK)
     
-    def get(self, request, *args, **kwargs):
-        module_id = request.data.get('module_id', '')
-        learning_module = LearningModule.objects.get(id=module_id)
-        data = search_point("learning_module", learning_module.qdrant_id)
-        return Response(data, status=status.HTTP_200_OK)
+    def list(self, request, *args, **kwargs):
+        goal_id = request.data.get('goal_id', '')
+        if goal_id:
+            learning_module = LearningModule.objects.filter(goal_id=goal_id).first()
+            data = search_point("learning_module", learning_module.qdrant_id)
+            return Response(data, status=status.HTTP_200_OK)
+        return super().list(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        id = kwargs.get('pk')
+        if id:
+            learning_module = LearningModule.objects.get(id=id)
+            test = Test.objects.filter(goal_id=learning_module.goal.pk).order_by('-created_at').first()
+            feedback = Feedback.objects.filter(learning_module=learning_module.pk).order_by('-created_at').first()
+            qdrant_id = learning_module.qdrant_id
+            score = Score.objects.filter(test_id=test.pk).order_by('-created_at').first()
+            roadmap = search_point("learning_module", qdrant_id).get('roadmap', '')
+            practice = search_point("learning_module", qdrant_id).get('practice', '')
+            roadmap, practice = update_learning_module(learning_module, test, feedback, score, roadmap=roadmap, practice=practice)
+            data = {
+                "roadmap": roadmap,
+                "practice": practice
+            }
+            new_qdrant_id = insert_point("learning_module", data)
+            learning_module.qdrant_id = new_qdrant_id
+            learning_module.save()
+            return Response({
+                "message": "Learning Module updated successfully"
+            }, status=status.HTTP_200_OK)
+        return super().partial_update(request, *args, **kwargs)
+
 
     
 
@@ -125,17 +164,23 @@ class TestModelViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Test.objects.filter(user=self.request.user)
     
-    def list(self, request, *args, **kwargs):
-        test_id = request.query_params.get('test_id', '')  # Use query_params for GET requests
-        print(test_id)
+    def retrieve(self, request, *args, **kwargs):
+        # Get the instance of the Test
+        instance = self.get_object()
+        data = search_point("tests", instance.qdrant_id)
+        return Response(data, status=status.HTTP_200_OK)
+    
+    # def list(self, request, *args, **kwargs):
+    #     test_id = request.data.get('test_id', '')  # Use query_params for GET requests
+    #     print(test_id)
 
-        if test_id:
-            test = get_object_or_404(Test, id=test_id)  # Handles DoesNotExist automatically
-            data = search_point("tests", test.qdrant_id)
-            return Response(data, status=status.HTTP_200_OK)
+    #     if test_id:
+    #         test = get_object_or_404(Test, id=test_id)  # Handles DoesNotExist automatically
+    #         data = search_point("tests", test.qdrant_id)
+    #         return Response(data, status=status.HTTP_200_OK)
 
-        # Ensure the response from the parent method is returned
-        return super().list(request, *args, **kwargs)
+    #     # Ensure the response from the parent method is returned
+    #     return super().list(request, *args, **kwargs)
         
     
     def create(self, request, *args, **kwargs):
@@ -175,6 +220,7 @@ class TestModelViewSet(viewsets.ModelViewSet):
             'qdrant_id': qdrant_id,
             'goal_id': goal_id,
             'type_of_quiz': type_of_quiz,
+            'module_info': module_info
             })
 
         if test_serializer.is_valid():

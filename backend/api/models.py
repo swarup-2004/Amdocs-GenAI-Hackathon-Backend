@@ -61,6 +61,7 @@ class Test(models.Model):
         B = "B", "Module Test"
     qdrant_id = models.CharField(max_length=255)
     goal_id = models.ForeignKey(Goal, on_delete=models.CASCADE, null=True, blank=True)
+    module_info = models.CharField(max_length=255, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     is_attempted = models.BooleanField(default=False)
@@ -68,7 +69,7 @@ class Test(models.Model):
         choices=TestType.choices,
         default=TestType.A)
     def __str__(self):
-        return self.qdrant_id
+        return self.module_info
     
 class Score(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -77,7 +78,7 @@ class Score(models.Model):
     test_id = models.ForeignKey(Test, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.user.username
+        return self.test_id.module_info
     
 
 class LearningModule(models.Model):
