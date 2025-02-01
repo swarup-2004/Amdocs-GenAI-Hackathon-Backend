@@ -15,10 +15,10 @@ chat = ChatGroq(temperature=0, groq_api_key=API_KEY, model_name="deepseek-r1-dis
 # 1. Roadmap Components
 # =====================
 roadmap_schemas = [
-    ResponseSchema(name="topics", description="Ordered list of learning topics with time allocation"),
-    ResponseSchema(name="prerequisites", description="Required foundational knowledge"),
-    ResponseSchema(name="weekly_breakdown", description="Detailed weekly learning objectives"),
-    ResponseSchema(name="key_milestones", description="Assessment points and project deadlines")
+    ResponseSchema(name="topics", description="Ordered list of learning topics with time allocation(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+    ResponseSchema(name="prerequisites", description="Required foundational knowledge(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+    ResponseSchema(name="weekly_breakdown", description="Detailed weekly learning objectives(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+    ResponseSchema(name="key_milestones", description="Assessment points and project deadlines(Format should be list Data structure in python such that each sentence is at separate index in the list)")
 ]
 roadmap_parser = StructuredOutputParser.from_response_schemas(roadmap_schemas)
 roadmap_format = roadmap_parser.get_format_instructions()
@@ -30,7 +30,9 @@ Create a comprehensive learning roadmap that:
 2. Includes practical projects
 3. Balances theory/practice
 4. Has clear progression markers
-Do not use end of line characters or any comments
+
+
+All text must be in the simple format do not highlight it or make it bold. Do not add end of line or any other non-human readable characters.
 
 Format: {format_instructions}"""
 
@@ -44,10 +46,10 @@ roadmap_prompt = PromptTemplate(
 # 2. Practice Components
 # ========================
 practice_schemas = [
-    ResponseSchema(name="active_recall", description="Spaced repetition prompts for key concepts"),
-    ResponseSchema(name="hands_on_projects", description="Project ideas with complexity grading"),
-    ResponseSchema(name="debugging_scenarios", description="Common error examples to solve"),
-    ResponseSchema(name="collaborative_learning", description="Pair programming/study group suggestions")
+    ResponseSchema(name="active_recall", description="Spaced repetition prompts for key concepts(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+    ResponseSchema(name="hands_on_projects", description="Project ideas with complexity grading(Format should be list Data structure in python such that each sentence is at separate index in the list))"),
+    ResponseSchema(name="debugging_scenarios", description="Common error examples to solve(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+    ResponseSchema(name="collaborative_learning", description="Pair programming/study group suggestions(Format should be list Data structure in python such that each sentence is at separate index in the list)")
 ]
 practice_parser = StructuredOutputParser.from_response_schemas(practice_schemas)
 practice_format = practice_parser.get_format_instructions()
@@ -60,7 +62,7 @@ Create practice instructions that:
 3. Provide real-world applications
 4. Suggest troubleshooting exercises
 
-Do not use end of line characters or any comments
+All text must be in the simple format do not highlight it or make it bold. Do not add end of line or any other non-human readable characters.
 
 Format: {format_instructions}"""
 

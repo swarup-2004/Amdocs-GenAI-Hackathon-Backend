@@ -59,10 +59,10 @@ def update_learning_module(learning_module: LearningModule, test: Test, feedback
     logger.info(f"Evaluation Results: {evaluation_results}")
 
     roadmap_schemas = [
-        ResponseSchema(name="topics", description="Ordered list of learning topics with time allocation."),
-        ResponseSchema(name="prerequisites", description="Required foundational knowledge."),
-        ResponseSchema(name="weekly_breakdown", description="Detailed weekly learning objectives."),
-        ResponseSchema(name="key_milestones", description="Assessment points and project deadlines.")
+        ResponseSchema(name="topics", description="Ordered list of learning topics with time allocation.(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+        ResponseSchema(name="prerequisites", description="Required foundational knowledge.(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+        ResponseSchema(name="weekly_breakdown", description="Detailed weekly learning objectives.(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+        ResponseSchema(name="key_milestones", description="Assessment points and project deadlines.(Format should be list Data structure in python such that each sentence is at separate index in the list)")
     ]
     roadmap_parser = StructuredOutputParser.from_response_schemas(roadmap_schemas)
     roadmap_format = roadmap_parser.get_format_instructions()
@@ -76,6 +76,7 @@ def update_learning_module(learning_module: LearningModule, test: Test, feedback
         
         Modify the roadmap accordingly while keeping the existing structure intact.
         
+        All text must be in the simple format do not highlight it or make it bold. Do not add end of line or any other non-human readable characters.
         Format: {{format_instructions}}
     """
     roadmap_prompt = PromptTemplate(
@@ -85,10 +86,10 @@ def update_learning_module(learning_module: LearningModule, test: Test, feedback
     )
     
     practice_schemas = [
-        ResponseSchema(name="active_recall", description="Spaced repetition prompts for key concepts."),
-        ResponseSchema(name="hands_on_projects", description="Project ideas with complexity grading."),
-        ResponseSchema(name="debugging_scenarios", description="Common error examples to solve."),
-        ResponseSchema(name="collaborative_learning", description="Pair programming/study group suggestions.")
+        ResponseSchema(name="active_recall", description="Spaced repetition prompts for key concepts.(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+        ResponseSchema(name="hands_on_projects", description="Project ideas with complexity grading.(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+        ResponseSchema(name="debugging_scenarios", description="Common error examples to solve.(Format should be list Data structure in python such that each sentence is at separate index in the list)"),
+        ResponseSchema(name="collaborative_learning", description="Pair programming/study group suggestions.(Format should be list Data structure in python such that each sentence is at separate index in the list)")
     ]
     practice_parser = StructuredOutputParser.from_response_schemas(practice_schemas)
     practice_format = practice_parser.get_format_instructions()
@@ -100,6 +101,8 @@ def update_learning_module(learning_module: LearningModule, test: Test, feedback
         2. Include multiple difficulty levels
         3. Provide real-world applications
         4. Suggest troubleshooting exercises
+
+        All text must be in the simple format do not highlight it or make it bold. Do not add end of line or any other non-human readable characters.
         
         Format: {{format_instructions}}
     """
@@ -136,11 +139,11 @@ def update_learning_module(learning_module: LearningModule, test: Test, feedback
     parsed_roadmap = roadmap_parser.parse(result["roadmap"])
     parsed_practice = practice_parser.parse(result["practice"])
     
-    print(roadmap)
-    print(f"Updated Roadmap: {parsed_roadmap}")
+    # print(roadmap)
+    # print(f"Updated Roadmap: {parsed_roadmap}")
 
 
-    print(practice)
-    print(f"Updated Practice: {parsed_practice}")
+    # print(practice)
+    # print(f"Updated Practice: {parsed_practice}")
     
     return parsed_roadmap, parsed_practice

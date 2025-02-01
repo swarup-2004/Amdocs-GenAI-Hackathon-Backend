@@ -45,6 +45,6 @@ class ChatBotAPIView(APIView):
         else:
             response = conversation.invoke(message)
 
-        print(response)
+        # print(response)
 
         return Response(response)

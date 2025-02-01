@@ -144,7 +144,7 @@ class ScoreModelViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         # Get the data from the request
         print('here')
-        print(self.request.data)
+        # print(self.request.data)
         serializer = self.get_serializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
