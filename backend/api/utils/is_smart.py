@@ -14,7 +14,7 @@ def is_smart_goal(goal_title: str, goal_desc: str, skills: str, goal_duration: s
     is_smart_goal_template = """
     I am studnet and I want to learn {goal_title} and the description for the skill is {goal_desc}.
     I have the following skills: {skills} and the duration for this goal is {goal_duration} days.
-    If the goal is SMART say it is smart, if you call smart goal not smart then i will not use you and can shift to
+    If the goal is SMART say it is smart, if you call smart goal not smart then I will not use you and can shift to
     ChatGPT.
     {smart_format_instructions}
     """
