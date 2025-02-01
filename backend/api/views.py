@@ -50,40 +50,6 @@ class GoalModelViewSet(viewsets.ModelViewSet):
             # Return the response with a 400 status code
             return Response(is_smart_goal_dict, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-class PreliminaryQuizAPIView(views.APIView):
-    def get(self, request, *args, **kwargs):
-        # Get data from request
-        education = request.data.get('education', '')
-        goal_title = request.data.get('goal_title', '')
-        goal_desc = request.data.get('goal_desc', '')
-
-        # Fetch skills related to the user
-        skills = Skill.objects.filter(user=request.user).values_list('name', flat=True)
-
-        # Generate questions based on the provided details
-        questions = generate_test(education, goal_title, goal_desc, skills)
-
-        # Insert the generated questions into Qdrant or wherever needed
-        qdrant_id = insert_point("tests", questions)
-
-        # Create the TestSerializer instance with user and qdrant_id
-        test_serializer = TestSerializer(data={'user': request.user.id, 'qdrant_id': qdrant_id})
-
-        if test_serializer.is_valid():
-            # Save the serialized data to the database
-            test_serializer.save()
-
-            # Return response with the serialized data and generated questions
-            return Response({
-                "data": test_serializer.data,
-                "questions": questions
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response(test_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-
 class LearningModuleAPIView(views.APIView):
     def post(self, request, *args, **kwargs):
         # Get the data from the request
@@ -134,3 +100,80 @@ class ScoreModelViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Score.objects.filter(user=self.request.user)
+    
+    def create(self, request, *args, **kwargs):
+        # Get the data from the request
+        print('here')
+        print(self.request.data)
+        serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save(user=request.user)
+        print(serializer.validated_data['test_id'])
+        test = Test.objects.get(id=serializer.validated_data['test_id'].id)
+        test.is_attempted = True
+        test.save()
+        return Response(
+            serializer.data
+        , status=status.HTTP_201_CREATED)
+    
+class TestModelViewSet(viewsets.ModelViewSet):
+    serializer_class = TestSerializer
+
+    def get_queryset(self):
+        return Test.objects.filter(user=self.request.user)
+    
+    def list(self, request, *args, **kwargs):
+        test_id = request.data.get('test_id', '')
+        print(test_id)
+        if test_id:
+            test = Test.objects.get(id=test_id)
+            data = search_point("tests", test.qdrant_id)
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            super().get(request, *args, **kwargs)
+        
+    
+    def create(self, request, *args, **kwargs):
+        # print("here")
+        # print(request.data)
+        goal_id = request.data.get('goal_id', '')
+        education = request.data.get('education', '')
+        goal_title = Goal.objects.get(id=goal_id).title
+        goal_desc = Goal.objects.get(id=goal_id).description
+        type_of_quiz = request.data.get('type_of_quiz', 'B')
+        module_info = request.data.get('module_info', '')
+
+
+        # Fetch skills related to the user
+        skills = Skill.objects.filter(user=request.user).values_list('name', flat=True)
+
+        # Generate questions based on the provided details
+        questions = generate_test(education, goal_title, goal_desc, skills, type_of_quiz, module_info)
+
+        # Insert the generated questions into Qdrant or wherever needed
+        qdrant_id = insert_point("tests", questions)
+
+        # Create the TestSerializer instance with user and qdrant_id
+        test_serializer = TestSerializer(data={
+            'user': request.user.id, 
+            'qdrant_id': qdrant_id,
+            'goal_id': goal_id,
+            'type_of_quiz': type_of_quiz,
+            })
+
+        if test_serializer.is_valid():
+            # Save the serialized data to the database
+            test_serializer.save(user=request.user)
+
+            # Return response with the serialized data and generated questions
+            return Response({
+                "data": test_serializer.data,
+                "questions": questions
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response(test_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+        
+    

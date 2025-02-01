@@ -56,9 +56,17 @@ class Skill(models.Model):
         return self.name
     
 class Test(models.Model):
+    class TestType(models.TextChoices):
+        A = "A", "Preliminary Test"
+        B = "B", "Module Test"
     qdrant_id = models.CharField(max_length=255)
+    goal_id = models.ForeignKey(Goal, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    is_attempted = models.BooleanField(default=False)
+    type_of_quiz = models.CharField(max_length=1,
+        choices=TestType.choices,
+        default=TestType.A)
     def __str__(self):
         return self.qdrant_id
     

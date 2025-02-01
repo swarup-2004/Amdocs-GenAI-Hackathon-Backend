@@ -52,17 +52,54 @@ Use the following format for the quiz:
 
 prompt_template = PromptTemplate.from_template(text)
 
-def generate_test(education: str, goal_title: str, goal_desc: str, skills: str) -> dict:
-    prompt = prompt_template.invoke({
-        "education": education,
-        "goal_title": goal_title,
-        "goal_desc": goal_desc,
-        "skills": skills,
-        "format_instructions": format_instructions
-    })
+general_text = text = """I am a {education} student.
+Questions should particulary focus on the following module: {module_info}
 
-    response = chat.invoke(prompt)
-    test_dict = questions_schema.parse(response.content)
+Please create a personalized 10-question quiz that:
+1. Assesses knowledge at all Bloom's Taxonomy levels (Remember, Understand, Apply, Analyze, Evaluate, Create)
+2. References my stated skills to build relevant questions
+3. Identifies knowledge gaps through targeted distractor options
+4. Progresses from foundational to complex concepts
+5. Includes this format for each question:
+
+**Question Type**: [Bloom's Level + Cognitive Verb] 
+**Skill Tested**: [Specific skill from my list or prerequisite] 
+**Difficulty Tier**: [Basic/Intermediate/Advanced based on my education] 
+**Question**: [Stem with context] 
+**Options**: [Multiple choice/distractors reflecting common misconceptions] 
+**Diagnostic Insight**: [What this question reveals about my understanding]
+Don't give any comments on the questions and do not use end of line characters. Instead of that start with the new line
+Use the following format for the quiz:
+{format_instructions}
+"""
+general_quiz_promt_template = PromptTemplate.from_template(general_text)
+
+
+
+def generate_test(education: str, goal_title: str, goal_desc: str, skills: str, type_of_quiz: str, module_info: str) -> dict:
+    test_dict = {}
+    if type_of_quiz == 'A':
+        prompt = prompt_template.invoke({
+            "education": education,
+            "goal_title": goal_title,
+            "goal_desc": goal_desc,
+            "skills": skills,
+            "format_instructions": format_instructions
+        })
+
+        response = chat.invoke(prompt)
+        test_dict = questions_schema.parse(response.content)
+
+    else:
+        prompt = general_quiz_promt_template.invoke({
+            "education": education,
+            "module_info": module_info,
+            "format_instructions": format_instructions
+        })
+
+        response = chat.invoke(prompt)
+        print(response.content)
+        test_dict = questions_schema.parse(response.content)
 
     return (test_dict)
 
