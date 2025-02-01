@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status, views
+from django.shortcuts import get_object_or_404
 from .serializers import CustomUserCreateSerializer, GoalSerializer, TestSerializer, FeedbackSerializer, ScoreSerializer
 from .models import Goal, Skill, Test, Score, Feedback, LearningModule
 from .utils.is_smart import is_smart_goal
@@ -125,14 +126,16 @@ class TestModelViewSet(viewsets.ModelViewSet):
         return Test.objects.filter(user=self.request.user)
     
     def list(self, request, *args, **kwargs):
-        test_id = request.data.get('test_id', '')
+        test_id = request.query_params.get('test_id', '')  # Use query_params for GET requests
         print(test_id)
+
         if test_id:
-            test = Test.objects.get(id=test_id)
+            test = get_object_or_404(Test, id=test_id)  # Handles DoesNotExist automatically
             data = search_point("tests", test.qdrant_id)
             return Response(data, status=status.HTTP_200_OK)
-        else:
-            super().get(request, *args, **kwargs)
+
+        # Ensure the response from the parent method is returned
+        return super().list(request, *args, **kwargs)
         
     
     def create(self, request, *args, **kwargs):
@@ -145,6 +148,17 @@ class TestModelViewSet(viewsets.ModelViewSet):
         type_of_quiz = request.data.get('type_of_quiz', 'B')
         module_info = request.data.get('module_info', '')
 
+        if type_of_quiz == 'A':
+            preliminary_quiz = Test.objects.filter(type_of_quiz='A', goal_id=goal_id).first()
+            if preliminary_quiz:
+                return Response({
+                    "data": {
+                        "id": preliminary_quiz.id,
+                        "is_attempted": preliminary_quiz.is_attempted,
+                        "message": "Preliminary test already exists for this goal",
+                        "questions": search_point("tests", preliminary_quiz.qdrant_id)
+                    }
+                }, status=status.HTTP_200_OK)
 
         # Fetch skills related to the user
         skills = Skill.objects.filter(user=request.user).values_list('name', flat=True)
