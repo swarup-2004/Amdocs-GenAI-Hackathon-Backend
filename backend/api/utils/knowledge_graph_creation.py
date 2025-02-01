@@ -154,15 +154,14 @@ MERGE (u:User {{
     for skill in profile_data['primary_skills']:
         skill_query = f"""
 WITH u
-MATCH (u:User), (s:Skill {{name: '{skill}'}})
-WHERE u.name = '{profile_data["firstName"]}' AND u.lastName = '{profile_data["lastName"]}'
+MATCH (s:Skill {{name: '{skill}'}})
 MERGE (u)-[:HAS_SKILL {{proficiency: 100, bloom_level: 'Create'}}]->(s)"""
         skill_queries.append(skill_query)
 
     # Create goal relationship query
     goal_query = f"""
 WITH DISTINCT u
-MATCH (u:User), (j:JobRole {{title: '{target_role}'}})
+MATCH (j:JobRole {{title: '{target_role}'}})
 WHERE u.name = '{profile_data["firstName"]}' AND u.lastName = '{profile_data["lastName"]}'
 MERGE (u)-[:TARGETS]->(j)"""
 
