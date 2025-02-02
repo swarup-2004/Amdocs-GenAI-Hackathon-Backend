@@ -154,10 +154,6 @@ Create three collections in Qdrant with the following schema:
   }
 }
 ```
-
-## Setup for Neo4j
-Ensure your Neo4j instance is running and configured with the credentials stored in your `.env` file.
-
 ## Additional Notes
 - If you encounter any issues, ensure all required dependencies are installed.
 - To deactivate the virtual environment, use:
