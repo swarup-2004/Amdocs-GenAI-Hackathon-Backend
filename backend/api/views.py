@@ -12,6 +12,7 @@ from .utils.preliminary_test_question_generation import generate_test
 from .utils.qdrant_utils import insert_point, search_point
 from .utils.learning_cell_generation import call_chain
 from .utils.update_learning_cell import update_learning_module
+from .utils.recommend_course import recommend_course
 
 
 User = get_user_model()
@@ -99,14 +100,21 @@ class LearningModuleModelViewSet(viewsets.ModelViewSet):
         goal_id = request.query_params.get('goal_id', '')
         if goal_id:
             learning_module = LearningModule.objects.filter(goal_id=goal_id).first()
+            serialized_data = LearningModuleSerializer(learning_module).data
             data = search_point("learning_module", learning_module.qdrant_id)
-            return Response(data, status=status.HTTP_200_OK)
+            # print(serialized_data)
+            print(data)
+            response = {
+                "id": serialized_data.get('id', ''),
+                "data": data.get('data')
+            }
+            return Response(response, status=status.HTTP_200_OK)
         return super().list(request, *args, **kwargs)
     
     def partial_update(self, request, *args, **kwargs):
         id = kwargs.get('pk')
         if id:
-            learning_module = LearningModule.objects.get(id=id)
+            learning_module = LearningModule.objects.get(goal=id)
             test = Test.objects.filter(goal_id=learning_module.goal.pk).order_by('-created_at').first()
             feedback = Feedback.objects.filter(learning_module=learning_module.pk).order_by('-created_at').first()
             qdrant_id = learning_module.qdrant_id
@@ -237,12 +245,16 @@ class TestModelViewSet(viewsets.ModelViewSet):
     
         
     
-# class CourseRecommendationAPIView(views.APIView):
+class CourseRecommendationAPIView(views.APIView):
 
-#     def get(self, request):
-#         goal_id = request.query_params.get('goal_id', '')
-#         if goal_id:
-#             course_recommendations_dict = recommend_course()
-#             return Response({
-#                 "message": "Goal ID is required"
-#             }, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request):
+        goal_id = request.query_params.get('goal_id', '')
+        if goal_id:
+            goal = Goal.objects.get(id=goal_id)
+            if goal:
+                course_recommendations_dict = recommend_course(goal.title, goal.description)
+                return Response(course_recommendations_dict, status=status.HTTP_200_OK)
+           
+        return Response({
+            "message": "Goal ID is required"
+        }, status=status.HTTP_400_BAD_REQUEST)
