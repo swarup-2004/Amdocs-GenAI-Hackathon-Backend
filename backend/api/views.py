@@ -103,7 +103,7 @@ class LearningModuleModelViewSet(viewsets.ModelViewSet):
             serialized_data = LearningModuleSerializer(learning_module).data
             data = search_point("learning_module", learning_module.qdrant_id)
             # print(serialized_data)
-            print(data)
+            # print(data)
             response = {
                 "id": serialized_data.get('id', ''),
                 "data": data.get('data')
