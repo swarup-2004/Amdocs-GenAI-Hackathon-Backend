@@ -11,9 +11,9 @@ class CustomUser(AbstractUser):
     # profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True) 
     city = models.CharField(max_length=255)
     college = models.CharField(max_length=255)
-    linkedin_url = models.URLField()
-    github_url = models.URLField()
-    leetcode_url = models.URLField()
+    linkedin_url = models.URLField(null=True, blank=True)
+    github_url = models.URLField(null=True, blank=True)
+    leetcode_url = models.URLField(null=True, blank=True)
     user_type = models.CharField(
         max_length=1,
         choices=UserType.choices,

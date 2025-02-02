@@ -96,7 +96,7 @@ class LearningModuleModelViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
     
     def list(self, request, *args, **kwargs):
-        goal_id = request.data.get('goal_id', '')
+        goal_id = request.query_params.get('goal_id', '')
         if goal_id:
             learning_module = LearningModule.objects.filter(goal_id=goal_id).first()
             data = search_point("learning_module", learning_module.qdrant_id)
