@@ -25,12 +25,16 @@ def evaluate(test: Test, feedback: Feedback, score: Score) -> dict:
     if not goal:
         raise ValueError("Goal not found.")
     
+    feedback_text = feedback.feedback
+    if not feedback_text:
+        feedback_text = "No feedback provided."
+    
     evaluation_text = f"""
         I am a {''} student.
         I want to learn {goal.title}, with this description: {goal.description}.
         I have completed the {test.module_info} and given a test on it.
         My score in the test is {score.wrong_fluency} and {score.right_fluency}.
-        My feedback regarding the module is {feedback.feedback}.
+        My feedback regarding the module is {feedback_text}.
         Base model is a model which is used to generate the learning module.
         
         {{evaluation_format_instructions}}
@@ -121,10 +125,15 @@ def update_learning_module(learning_module: LearningModule, test: Test, feedback
         output_variables=["roadmap", "practice"],
         verbose=False
     )
+
+    feedback_text = feedback.feedback
+    if not feedback_text:
+        feedback_text = "No feedback provided."
+    
     
     try:
         result = chain({
-            "feedback": feedback.feedback,
+            "feedback": feedback_text,
             "module_info": test.module_info,
             "error_fluency": score.wrong_fluency,
             "correct_fluency": score.right_fluency, 

@@ -85,12 +85,14 @@ class LearningModule(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     goal = models.ForeignKey(Goal, on_delete=models.CASCADE)
     qdrant_id = models.CharField(max_length=255)
+    def __str__(self):
+        return self.goal.title
     
 
 class Feedback(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     learning_module = models.ForeignKey(LearningModule, on_delete=models.CASCADE, default=None)
-    feedback = models.TextField()
+    feedback = models.TextField(default="")
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.user.username
