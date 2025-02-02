@@ -237,3 +237,12 @@ class TestModelViewSet(viewsets.ModelViewSet):
     
         
     
+# class CourseRecommendationAPIView(views.APIView):
+
+#     def get(self, request):
+#         goal_id = request.query_params.get('goal_id', '')
+#         if goal_id:
+#             course_recommendations_dict = recommend_course()
+#             return Response({
+#                 "message": "Goal ID is required"
+#             }, status=status.HTTP_400_BAD_REQUEST)

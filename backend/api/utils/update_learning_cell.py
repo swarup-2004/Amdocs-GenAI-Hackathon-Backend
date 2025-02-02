@@ -25,9 +25,11 @@ def evaluate(test: Test, feedback: Feedback, score: Score) -> dict:
     if not goal:
         raise ValueError("Goal not found.")
     
-    feedback_text = feedback.feedback
-    if not feedback_text:
-        feedback_text = "No feedback provided."
+    feedback_text = "No feedback provided."
+    if feedback:
+        feedback_text = feedback.feedback
+
+        
     
     evaluation_text = f"""
         I am a {''} student.
@@ -70,9 +72,13 @@ def update_learning_module(learning_module: LearningModule, test: Test, feedback
     ]
     roadmap_parser = StructuredOutputParser.from_response_schemas(roadmap_schemas)
     roadmap_format = roadmap_parser.get_format_instructions()
+
+    feedback_text = "No feedback provided."
+    if feedback:
+        feedback_text = feedback.feedback
     
     roadmap_template = f"""
-        This is the feedback for a previous roadmap: {feedback.feedback}. 
+        This is the feedback for a previous roadmap: {feedback_text}. 
         The test scores for the module {test.module_info} are {score.wrong_fluency} and {score.right_fluency}.
         The reward model has given a score of {evaluation_results['reward']}.
         Suggestions: {evaluation_results['suggestions']}.
@@ -125,12 +131,7 @@ def update_learning_module(learning_module: LearningModule, test: Test, feedback
         output_variables=["roadmap", "practice"],
         verbose=False
     )
-
-    feedback_text = feedback.feedback
-    if not feedback_text:
-        feedback_text = "No feedback provided."
-    
-    
+ 
     try:
         result = chain({
             "feedback": feedback_text,
@@ -156,3 +157,7 @@ def update_learning_module(learning_module: LearningModule, test: Test, feedback
     # print(f"Updated Practice: {parsed_practice}")
     
     return parsed_roadmap, parsed_practice
+
+
+
+
