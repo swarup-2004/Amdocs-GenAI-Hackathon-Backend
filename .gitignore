@@ -25,7 +25,7 @@ db.sqlite3
 .env
 
 # Django migrations
-*/migrations/*
+# */migrations/*
 
 # Virtual environment
 venv/
