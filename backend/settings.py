@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 load_dotenv()
 
@@ -100,11 +101,8 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': dj_database_url.config(default='postgresql://amdocs:nmY80dCVVGnGgAhDxPXhnNS6G4bAUjVF@dpg-cuhqdmtds78s73c4hpog-a/amdocs',conn_max_age=600)
     }
-}
 
 
 
