@@ -71,7 +71,8 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'https://amdocs-frontend.vercel.app',
-    'http://localhost:5173',  # Frontend URL
+    'http://localhost:5173',
+    'https://pathfinderai.vercel.app',  # Frontend URL
 ]
 
 CORS_ALLOW_CREDENTIALS = True
