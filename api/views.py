@@ -42,16 +42,11 @@ class GoalModelViewSet(viewsets.ModelViewSet):
         # print(type(skills))
         is_smart_goal_dict = is_smart_goal(goal_title, goal_description, skills, goal_duration_months * 30 + goal_duration_days)
         # print(is_smart_goal_dict['is_smart'])
-        if is_smart_goal_dict['is_smart'].lower() == 'yes':
-            serializer.validated_data['is_smart'] = True
-            # Save the instance and explicitly pass the user
-            serializer.save(user=request.user)
-
-            # Return the serialized data with a 201 response (created)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            # Return the response with a 400 status code
-            return Response(is_smart_goal_dict, status=status.HTTP_400_BAD_REQUEST)
+        if is_smart_goal_dict['is_smart'].lower() != 'yes':
+            serializer.validated_data['description'] = is_smart_goal_dict['smart_example'] 
+        serializer.validated_data['is_smart'] = True
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LearningModuleModelViewSet(viewsets.ModelViewSet):
     serializer_class = LearningModuleSerializer
