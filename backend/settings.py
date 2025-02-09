@@ -70,7 +70,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'https://amdocs-frontend.vercel.app',  # Frontend URL
+    'https://amdocs-frontend.vercel.app',
+    'http://localhost:5173',  # Frontend URL
 ]
 
 CORS_ALLOW_CREDENTIALS = True
