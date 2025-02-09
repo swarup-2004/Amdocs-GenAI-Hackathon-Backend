@@ -70,7 +70,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',  # Frontend URL
+    'https://amdocs-frontend.vercel.app',  # Frontend URL
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -185,7 +185,7 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_THROTTLE_RATES': {
-        'user': '20/minute',
+        'user': '60/minute',
         'anon': '40/minute',
     },
 }
@@ -197,8 +197,8 @@ DJOSER = {
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'USERNAME_RESET_CONFIRM_URL': 'reset-username/{uid}/{token}',
     'PASSWORD_RESET_CONFIRM_URL': 'reset-password/{uid}/{token}/',
-    'SEND_ACTIVATION_EMAIL': True,
-    'ACTIVATION_URL': 'activate/{uid}/{token}/',
+    # 'SEND_ACTIVATION_EMAIL': True,
+    # 'ACTIVATION_URL': 'activate/{uid}/{token}/',
     'SERIALIZERS': {
         'user_create': 'api.serializers.CustomUserCreateSerializer',
         'user': 'api.serializers.CustomUserSerializer',
