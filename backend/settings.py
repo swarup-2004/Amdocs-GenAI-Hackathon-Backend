@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-kqor+i2u1cxxrrb&l#=w@7g1kf^fks^zy1c^*dvv0!#-b6%q9j"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -103,6 +103,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 DATABASES = {
     'default': dj_database_url.config(default='postgresql://admin:zMqngUvO1WzWUFUb6bHluN61yApD9Wz2@dpg-cviieaogjchc73cu5890-a/pathfinder_ajvs',conn_max_age=600)
+    # 'default': dj_database_url.config(default='sqlite:///db.sqlite3',conn_max_age=600)
     }
 
 
