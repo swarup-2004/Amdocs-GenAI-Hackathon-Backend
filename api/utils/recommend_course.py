@@ -7,7 +7,7 @@ from langchain_groq import ChatGroq
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-chat = ChatGroq(temperature=0, groq_api_key=GROQ_API_KEY, model_name="mixtral-8x7b-32768")
+chat = ChatGroq(temperature=0, groq_api_key=GROQ_API_KEY, model_name="llama3-8b-8192")
 
 def recommend_course(goal_title: str, goal_desc: str) -> dict:
     course_title_schema = ResponseSchema(name="course_title", description="The title of the recommended course.")
