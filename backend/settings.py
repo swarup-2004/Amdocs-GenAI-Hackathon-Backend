@@ -102,7 +102,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default='postgresql://amdocs:nmY80dCVVGnGgAhDxPXhnNS6G4bAUjVF@dpg-cuhqdmtds78s73c4hpog-a/amdocs',conn_max_age=600)
+    'default': dj_database_url.config(default='postgresql://admin:zMqngUvO1WzWUFUb6bHluN61yApD9Wz2@dpg-cviieaogjchc73cu5890-a/pathfinder_ajvs',conn_max_age=600)
     }
 
 
