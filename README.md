@@ -1,5 +1,7 @@
 # Amdocs-GenAI-Hackathon-Backend
 
+![alt text](https://github.com/swarup-2004/Amdocs-GenAI-Hackathon-Backend/blob/main/Overall-Architecture.png?raw=true)
+
 ## Prerequisites
 Ensure you have the following installed on your system:
 - Python >= 3.8
